@@ -1,6 +1,5 @@
 package com.dice.weather.controller;
 
-
 import com.dice.weather.customexeptions.ForecastTypeValidationException;
 import com.dice.weather.customexeptions.LocationValidationException;
 import com.dice.weather.errors.Error;
@@ -18,8 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -42,13 +39,12 @@ public class WeatherController {
     @GetMapping("/status")
     public String checkApiStatus() throws UnirestException {
         System.out.println("Hello World ");
-//        HttpResponse<String> response = Unirest.get("https://forecast9.p.rapidapi.com/status/")
-//                .header("X-RapidAPI-Key", "e4b29160cfmsha1fc0c7b57bd76cp114691jsn42d39c1cf99e")
-//                .header("X-RapidAPI-Host", "forecast9.p.rapidapi.com")
-//                .asString();
-//
-//        return response.getBody();
-        return "Yes";
+        HttpResponse<String> response = Unirest.get("https://forecast9.p.rapidapi.com/status/")
+                .header("X-RapidAPI-Key", "e4b29160cfmsha1fc0c7b57bd76cp114691jsn42d39c1cf99e")
+                .header("X-RapidAPI-Host", "forecast9.p.rapidapi.com")
+                .asString();
+
+        return response.getBody();
     }
 
 
@@ -56,24 +52,21 @@ public class WeatherController {
     @ResponseBody
     public ResponseEntity<?> getForecastSummaryByLocationName(@RequestParam String location, @RequestParam String type) {
 
-        System.out.println("Testing");
-        System.out.println(location + " " + type);
+        if (!location.toLowerCase().matches("^[a-zA-Z]*$"))
+            throw new LocationValidationException("Location contains non alphabetical character :: " + location);
 
-//        if (!location.toLowerCase().matches("^[a-zA-Z]*$"))
-//            throw new LocationValidationException("Location contains non alphabetical character :: " + location);
-//
-//        if (!type.toLowerCase().equals("summary") && !type.toLowerCase().equals("hourly"))
-//            throw new ForecastTypeValidationException("Forecast type must be summary or hourly only :: " + type);
-//
-//        try {
-//            List<Weather> response = weatherService.fetchForecastByLocationName(location.toLowerCase(), type.toLowerCase());
-//            return ResponseEntity.ok(response);
-//
-//        } catch (UnirestException e) {
-//            Error error = new Error(400, e.getMessage());
-//            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
-//        }
-        return ResponseEntity.ok("Woking");
+        if (!type.toLowerCase().equals("summary") && !type.toLowerCase().equals("hourly"))
+            throw new ForecastTypeValidationException("Forecast type must be summary or hourly only :: " + type);
+
+        try {
+            List<Weather> response = weatherService.fetchForecastByLocationName(location.toLowerCase(), type.toLowerCase());
+            return ResponseEntity.ok(response);
+
+        } catch (UnirestException e) {
+            Error error = new Error(400, e.getMessage());
+            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        }
+
     }
 
 
@@ -87,12 +80,7 @@ public class WeatherController {
     }
     @PostMapping("/authenticate")
     public ResponseEntity<?> authenticateAndGetToken(@RequestBody AuthRequest authRequest) throws Exception {
-        System.out.println(authRequest.getUsername());
-        System.out.println(authRequest.getPassword());
-
         try{
-            System.out.println("Yes");
-
             this.authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(),authRequest.getPassword()));
 
         }
