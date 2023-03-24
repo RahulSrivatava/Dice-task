@@ -87,8 +87,8 @@ public class WeatherController {
         catch (BadCredentialsException e){
             throw new BadCredentialsException("Unathorized");
         }
-            String token=jwtService.generateToken(authRequest.getUsername());
-            return ResponseEntity.ok(new AuthResponse(token));
+        String token = jwtService.generateToken(authRequest.getUsername());
+        return ResponseEntity.ok(new AuthResponse(token));
     }
 
 

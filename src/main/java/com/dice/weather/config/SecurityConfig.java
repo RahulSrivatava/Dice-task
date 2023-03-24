@@ -1,6 +1,5 @@
 package com.dice.weather.config;
 
-//import com.dice.weather.service.CustomUserDetails;
 import com.dice.weather.filter.JwtAuthFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -8,7 +7,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -32,15 +30,18 @@ public class SecurityConfig {
     private JwtAuthFilter authFilter;
 
     @Bean
-    //authentication
     public UserDetailsService userDetailsService() {
 
         UserDetails admin = User.withUsername("Rahul")
                 .password( passwordEncoder().encode("rahul@123"))
                 .roles()
                 .build();
+        UserDetails admin1 = User.withUsername("Rohit")
+                .password( passwordEncoder().encode("rohit@123"))
+                .roles()
+                .build();
 
-        return new InMemoryUserDetailsManager(admin);
+        return new InMemoryUserDetailsManager(admin,admin1);
     }
 
     @Bean
@@ -55,7 +56,6 @@ public class SecurityConfig {
                 .and()
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(authFilter,UsernamePasswordAuthenticationFilter.class).build();
-
     }
     @Bean
     public AuthenticationProvider authenticationProvider(){
