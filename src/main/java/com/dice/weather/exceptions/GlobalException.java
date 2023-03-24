@@ -5,6 +5,7 @@ import com.dice.weather.customexeptions.LocationValidationException;
 import com.dice.weather.errors.Error;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -21,6 +22,11 @@ public class GlobalException {
     public ResponseEntity<Error> forecastTypeValidation(ForecastTypeValidationException exception) {
         Error error = new Error(400, exception.getMessage());
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(value = BadCredentialsException.class)
+    public ResponseEntity<Error> badCredentialValidation(BadCredentialsException exception) {
+        Error error = new Error(401, exception.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
     }
 
 }
